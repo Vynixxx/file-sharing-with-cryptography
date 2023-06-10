@@ -1,0 +1,107 @@
+Tugas Besar:
+Membuat sebuah sistem yang menerapkan metode kriptografi gabungan klasik dan modern.
+Sistem bisa dalam bentuk aplikasi berbasis desktop atau sistem web (yang terdapat halaman login)
+Contoh aplikasi berbasis dekstop: untuk mengenkripsi sebuah file di PC
+Contoh sistem berbasis web: sistem informasi akademik
+Bahasa pemrograman boleh menggunakan PHP atau Python
+Yang dikumpulkan projek dalam bentuk sistem dan laporan
+
+<!--
+  <script>
+    document.getElementById('upload-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    var fileInput = document.getElementById('file-input');
+    var file = fileInput.files[0];
+    
+    if (file) {
+        // Code to handle file upload (e.g., send to server)
+        console.log('File:', file.name);
+        
+        // Reset the form
+        fileInput.value = '';
+    }
+    });-->
+
+
+//upload.php
+<?php
+// require_once 'conn.php';
+
+// Mendefinisikan kunci enkripsi
+$key = 'kunci_rahasia';
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  if ($_FILES["file"]["error"] === UPLOAD_ERR_OK) {
+    $filename = $_FILES["file"]["name"];
+    $filesize = $_FILES["file"]["size"];
+    $filetype = $_FILES["file"]["type"];
+    $filetmp = $_FILES["file"]["tmp_name"];
+
+    // Membaca konten file yang diunggah
+    $fileContent = file_get_contents($filetmp);
+
+    // Melakukan enkripsi konten file
+    $encryptedContent = openssl_encrypt($fileContent, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv);
+
+    // Simpan file yang terenkripsi ke dalam database
+    $conn = new mysqli("localhost", "root", "", "db_filesharing");
+    if ($conn->connect_error) {
+      die("Koneksi database gagal: " . $conn->connect_error);
+    }
+
+    // Escape data sebelum menyimpan ke database (untuk mencegah serangan SQL injection)
+    $filename = $conn->real_escape_string($filename);
+    $filesize = $conn->real_escape_string($filesize);
+    $filetype = $conn->real_escape_string($filetype);
+    $encryptedContent = $conn->real_escape_string($encryptedContent);
+
+    // Menyimpan informasi file terenkripsi ke dalam database
+    $sql = "INSERT INTO files (filename, filesize, filetype, content) VALUES ('$filename', $filesize, '$filetype', '$encryptedContent')";
+    if ($conn->query($sql) === TRUE) {
+      echo "File Anda telah berhasil diunggah.";
+    } else {
+      echo "Maaf, kami gagal menyimpan file: " . $conn->error;
+    }
+
+    $conn->close();
+  } else {
+    echo "Tidak ada file yang diunggah.";
+  }
+}
+
+header("Location: sharing.php");
+exit;
+?>
+
+//downloadimg.php
+<?php
+// Step 1: Koneksi ke database
+$connection = mysqli_connect("localhost", "root", "", "db_filesharing");
+if (!$connection) {
+  die("Koneksi database gagal: " . mysqli_connect_error());
+}
+
+// Step 2: Mengambil parameter "filename" dari URL
+$filename = $_GET['filename'];
+
+// Step 3: Mengambil isi file dari tabel "files"
+$query = "SELECT content, filetype FROM files WHERE filename = '$filename'";
+$result = mysqli_query($connection, $query);
+
+if ($result && mysqli_num_rows($result) > 0) {
+  $row = mysqli_fetch_assoc($result);
+  $content = $row['content'];
+  $filetype = $row['filetype'];
+
+  // Step 4: Mengatur header dan menampilkan file PDF untuk diunduh
+  header("Content-type: $filetype");
+  header("Content-Disposition: attachment; filename=\"$filename\"");
+  echo $content;
+} else {
+  echo "File tidak ditemukan.";
+}
+
+// Step 5: Menutup koneksi ke database
+mysqli_close($connection);
+?>
