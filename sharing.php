@@ -144,25 +144,26 @@ footer {
         <div class="file">
             <a href="video.php"><img src="2.png" alt="Video Icon"></a>
             <a href="video.php"><p>Video</p></a>
-          </div>
-          <div class="file">
+        </div>
+        <div class="file">
             <a href="doc.php"><img src="p.png" alt="Document Icon"></a>
             <a href="doc.php"><p>Document</p></a>
-          </div>
-          <div class="file">
+        </div>
+        <div class="file">
             <a href="img.php"><img src="i.png" alt="Image Icon"></a>
             <a href="img.php"><p>Image</p></a>
-          </div>    
-        </div>
-    
-    
+        </div>    
+    </div>
+
     <h3>Unggah File</h3>
     <form enctype="multipart/form-data" method="post" action="upload.php" id="upload-form">
+        <label for="file">File:</label>
         <input type="file" name="file" required>
+        <label for="encryption-key">Kunci Enkripsi:</label>
+        <input type="password" name="encryption-key" required>
         <input type="submit" value="Unggah" id="upload-btn">
     </form>
-  </div>
-
+</div>
 
   <footer>
     &copy; 2023 Sistem File Sharing. All rights reserved.
