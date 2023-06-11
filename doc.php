@@ -84,35 +84,44 @@ footer {
   </header>
   
   <div class="container">
-    <h2>Daftar File PDF</h2>
+    <h2>Daftar File Dokumen</h2>
 
     <?php
     // Step 1: Koneksi ke database
     $connection = mysqli_connect("localhost", "root", "", "db_filesharing");
     if (!$connection) {
       die("Koneksi database gagal: " . mysqli_connect_error());
+  }
+
+  // Step 2: Mengambil data file dokumen dari tabel "files" dengan format dokumen yang diinginkan
+  $documentFormats = array(
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.ms-powerpoint',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+  );
+  $formatConditions = implode("', '", $documentFormats);
+  $query = "SELECT id, filename FROM files WHERE filetype IN ('$formatConditions')";
+  $result = mysqli_query($connection, $query);
+
+  // Step 3: Menampilkan daftar file dokumen
+  if ($result && mysqli_num_rows($result) > 0) {
+    while ($row = mysqli_fetch_assoc($result)) {
+      $fileId = $row['id'];
+      $filename = $row['filename'];
+
+      echo "<p><a href='downloaddoc.php?id=" . urlencode($fileId) . "'>$filename</a></p>";
     }
+  } else {
+    echo "Tidak ada file Dokumen yang ditemukan.";
+  }
 
-    // Step 2: Mengambil data file PDF dari tabel "files"
-    $query = "SELECT id, filename FROM files WHERE filetype = 'application/pdf'";
-    $result = mysqli_query($connection, $query);
-
-    // Step 3: Menampilkan daftar file PDF
-    if ($result && mysqli_num_rows($result) > 0) {
-      while ($row = mysqli_fetch_assoc($result)) {
-        $fileId = $row['id'];
-        $filename = $row['filename'];
-
-        echo "<p><a href='downloaddoc.php?id=" . urlencode($fileId) . "'>$filename</a></p>";
-      }
-    } else {
-      echo "Tidak ada file PDF yang ditemukan.";
-    }
-
-    // Step 4: Menutup koneksi ke database
-    mysqli_close($connection);
-    ?>
-
+  // Step 4: Menutup koneksi ke database
+  mysqli_close($connection);
+  ?>
   </div>
 
   <footer>
