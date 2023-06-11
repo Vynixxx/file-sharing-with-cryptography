@@ -53,9 +53,9 @@ if ($database->connect_error) {
 }
 
 // Proses unggah file jika ada file yang diunggah
-if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
+if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK && isset($_POST['encryption-key'])) {
     $uploadedFile = $_FILES['file'];
-    $encryptionKey = '@AndaKepoSekaliTampaknya88218'; // kunci enkripsi
+    $encryptionKey = $_POST['encryption-key']; // Kunci enkripsi dari input pengguna
 
     $result = encryptAndSaveFile($uploadedFile, $encryptionKey, $database);
     if ($result) {
@@ -66,7 +66,7 @@ if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
         echo "Terjadi kesalahan saat menyimpan file.";
     }
 } else {
-    echo "Terjadi kesalahan saat mengunggah file.";
+    echo "Terjadi kesalahan saat mengunggah file atau tidak ada kunci enkripsi yang diberikan.";
 }
 
 // Tutup koneksi database
