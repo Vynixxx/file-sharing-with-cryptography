@@ -82,7 +82,7 @@ footer {
             $fileId = $row['id'];
             $filename = $row['filename'];
 
-            echo "<p><a href='downloadimg.php?id=$fileId'>$filename</a></p>";
+            echo "<p><a href='downloadimg.php?id=$fileId'>Download: $filename</a></p>";
         }
     } else {
         echo "Tidak ada file Gambar yang ditemukan.";
