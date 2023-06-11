@@ -63,37 +63,38 @@ footer {
   </header>
   
   <div class="container">
-    <h2>Daftar File Video</h2>
+  <h2>Daftar File Video</h2>
 
-    <?php
-    // Step 1: Koneksi ke database
-    $connection = mysqli_connect("localhost", "root", "", "db_filesharing");
-    if (!$connection) {
-      die("Koneksi database gagal: " . mysqli_connect_error());
+  <?php
+  // Step 1: Koneksi ke database
+  $connection = mysqli_connect("localhost", "root", "", "db_filesharing");
+  if (!$connection) {
+    die("Koneksi database gagal: " . mysqli_connect_error());
+  }
+
+  // Step 2: Mengambil data file video dari tabel "files" dengan format video yang diinginkan
+  $videoFormats = array('video/mp4', 'video/mpeg', 'video/avi', 'video/mov');
+  $formatConditions = implode("', '", $videoFormats);
+  $query = "SELECT id, filename FROM files WHERE filetype IN ('$formatConditions')";
+  $result = mysqli_query($connection, $query);
+
+  // Step 3: Menampilkan daftar file video
+  if ($result && mysqli_num_rows($result) > 0) {
+    while ($row = mysqli_fetch_assoc($result)) {
+      $fileId = $row['id'];
+      $filename = $row['filename'];
+
+      echo "<p><a href='downloadvid.php?id=" . urlencode($fileId) . "'>$filename</a></p>";
     }
+  } else {
+    echo "Tidak ada file Video yang ditemukan.";
+  }
 
-    // Step 2: Mengambil data file video dari tabel "files"
-    $query = "SELECT id, filename FROM files WHERE filetype = 'video/mp4'";
-    $result = mysqli_query($connection, $query);
+  // Step 4: Menutup koneksi ke database
+  mysqli_close($connection);
+  ?>
+</div>
 
-    // Step 3: Menampilkan daftar file video
-    if ($result && mysqli_num_rows($result) > 0) {
-      while ($row = mysqli_fetch_assoc($result)) {
-        $fileId = $row['id'];
-        $filename = $row['filename'];
-
-        echo "<p><a href='downloadvid.php?id=" . urlencode($fileId) . "'>$filename</a></p>";
-      }
-    } else {
-      echo "Tidak ada file Video yang ditemukan.";
-    }
-
-    // Step 4: Menutup koneksi ke database
-    mysqli_close($connection);
-    ?>
-
-
-  </div>
 
   <footer>
     &copy; 2023 Sistem File Sharing. All rights reserved.
